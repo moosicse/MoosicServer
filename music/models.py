@@ -18,7 +18,7 @@ class Singer(models.Model):
 
 class Album(models.Model):
     name = models.CharField(max_length=20, blank=True, null=True)
-    singer = models.ManyToManyField(Singer, blank=True, null=True)
+    singer = models.ManyToManyField(Singer)
     published_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
 
@@ -27,9 +27,9 @@ class Song(models.Model):
     name = models.CharField(max_length=20)
     singer = models.ForeignKey(Singer, blank=True, null=True, on_delete=models.SET_NULL)
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.SET_NULL)
-    genres = models.ManyToManyField(Genre, blank=True, null=True, related_name='song_set')
+    genres = models.ManyToManyField(Genre, related_name='song_set')
     mood = models.TextField(default='{}')
-    user_group = models.ManyToManyField('account.UserProfile', related_name='song_set')
+    user_group = models.ManyToManyField('account.UserGroup', related_name='song_set')
     file = models.FileField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 
