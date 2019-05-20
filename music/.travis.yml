@@ -4,12 +4,10 @@ python: "3.7"
 notifications:
   email: false
 
-sudo: false
+sudo: required
 
 before_install:
-  - pip install -r requirements.txt
-
-install: true
+  - sudo pip install -r requirements.txt
 
 script:
-  - python manage.py test
+  - python ./manage.py test
