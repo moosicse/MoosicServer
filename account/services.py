@@ -5,10 +5,6 @@ from music.models import Song
 
 
 class UserServices:
-    @classmethod
-    def _user_has_access_to_music(cls, user: User, song: Song):
-        user_profile = user.profile
-        return cls.user_has_access_to_music(user_profile, song)
 
     @classmethod
     def user_has_access_to_music(cls, user_profile: UserProfile, song: Song):

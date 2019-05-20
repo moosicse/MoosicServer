@@ -14,7 +14,7 @@ before_install:
   - pip3 install coverage
 
 script:
-  - python3 ./manage.py test
+  - coverage run --omit="venv/*",manage.py,*migrations*,tests.py,__init__.py ./manage.py test
 
 after_success:
   - codecov
