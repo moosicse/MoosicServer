@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from account.models import UserGroup, UserProfile
+
+
+@admin.register(UserProfile, UserGroup)
+class AccountAdmin(admin.ModelAdmin):
+    pass
