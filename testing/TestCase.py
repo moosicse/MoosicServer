@@ -6,7 +6,7 @@ from music.models import Song
 
 
 class TestCases(DjangoTestCase):
-    
+
     # Model account
     @classmethod
     def get_password(cls, username: str):
