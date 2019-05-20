@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from account.models import UserGroup
 from music.constants import SEX_CHOICES
 
 
@@ -30,7 +29,7 @@ class Song(models.Model):
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.SET_NULL)
     genres = models.ManyToManyField(Genre, blank=True, null=True, related_name='song_set')
     mood = models.TextField(default='{}')
-    user_group = models.ManyToManyField(UserGroup, related_name='song_set')
+    user_group = models.ManyToManyField('account.UserProfile', related_name='song_set')
     file = models.FileField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
 

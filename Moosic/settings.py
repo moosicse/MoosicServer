@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Django models
-    'account.models',
-    'music.models',
+    'account.apps.AccountConfig',
+    'music.apps.MusicConfig',
 ]
 
 MIDDLEWARE = [
