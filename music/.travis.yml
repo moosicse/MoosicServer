@@ -1,3 +1,4 @@
+dist: xenial   # required for Python >= 3.7
 language: python
 python: "3.7"
 
@@ -10,4 +11,4 @@ before_install:
   - sudo pip install -r requirements.txt
 
 script:
-  - python ./manage.py test
+  - python3 ./manage.py test
