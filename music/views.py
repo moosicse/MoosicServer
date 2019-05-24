@@ -1,7 +1,9 @@
+from django.contrib.auth.models import AnonymousUser
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
 
+from account.services import UserServices
 from music.models import Song
 from music.permissions import UserHasSongPermission
 from music.serializers import SongSerializer
@@ -16,6 +18,14 @@ class SongViewSet(viewsets.ModelViewSet):
 
     @action(detail=False)
     def lucky(self, request):
-        all_song = Song.objects.all()
-        selected = random.sample(range(all_song.count()), 1)[0]
-        return Response(SongSerializer(all_song[selected]).data)
+        user = request.user
+        if isinstance(user, AnonymousUser):
+            songs_to_select = Song.objects.filter(user_group__isnull=True)
+        else:
+            songs_to_select = Song.objects.filter(user_group__users=user)
+
+        if songs_to_select.count() == 0:
+            return Response({})
+
+        selected = random.sample(range(songs_to_select.count()), 1)[0]
+        return Response(SongSerializer(songs_to_select[selected]).data)
