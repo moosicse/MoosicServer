@@ -24,6 +24,7 @@ class Singer(models.Model):
 
 class Album(models.Model):
     name = models.CharField(max_length=20, blank=True, null=True)
+    cover = models.ImageField(upload_to='image', blank=True, null=True)
     singer = models.ManyToManyField(Singer)
     published_date = models.DateField(null=True, blank=True)
     description = models.TextField(blank=True, null=True)
@@ -34,6 +35,7 @@ class Album(models.Model):
 
 class Song(models.Model):
     name = models.CharField(max_length=20)
+    cover = models.ImageField(upload_to='image', blank=True, null=True)
     singer = models.ForeignKey(Singer, blank=True, null=True, on_delete=models.SET_NULL)
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.SET_NULL)
     genres = models.ManyToManyField(Genre, blank=True, related_name='song_set')
