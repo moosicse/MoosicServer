@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework import viewsets
 
 from music.models import Song
+from music.permissions import UserHasSongPermission
 from music.serializers import SongSerializer
-from shared.permissions import AllowAllPermission
 
 import random
 
@@ -12,7 +12,7 @@ import random
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
-    permission_classes = (AllowAllPermission,)
+    permission_classes = (UserHasSongPermission,)
 
     @action(detail=False)
     def lucky(self, request):
