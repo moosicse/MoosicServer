@@ -29,4 +29,4 @@ class SongViewSet(viewsets.ModelViewSet):
             return Response({})
 
         selected = random.sample(range(songs_to_select.count()), 1)[0]
-        return Response(SongSerializer(songs_to_select[selected]).data)
+        return Response(SongSerializer([songs_to_select[selected]], many=True).data)
