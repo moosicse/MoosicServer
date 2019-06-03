@@ -34,7 +34,6 @@ class TestCases(DjangoTestCase):
         user = self._create_user(*args, **kwargs)
         user_profile = UserProfile.objects.create(
             user=user,
-            name=user.username,
         )
         return user_profile
 

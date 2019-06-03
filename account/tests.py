@@ -1,5 +1,55 @@
+from rest_framework.test import APIClient
+
 from account.services import UserServices
 from testing.TestCase import TestCases
+
+
+class UserAccountTest(TestCases):
+    def setUp(self):
+        self.anonymous_client_1 = APIClient(enforce_csrf_checks=True)
+        self.anonymous_client_2 = APIClient(enforce_csrf_checks=False)
+
+        self.user1 = self.create_user('user1')
+        self.user1.user.set_password('user1_password')
+        self.user1.user.email = 'user1@test.com'
+        self.user1.user.save()
+
+    def test_register(self):
+        req = self.anonymous_client_1.get('/api/account/profile/')
+        self.assertEqual(req.status_code, 403)
+
+        req = self.anonymous_client_1.post(
+            '/api/account/',
+            data={
+                'username': 'test_user1',
+                'email': 'test@test.com',
+                'password': 'test_pass'
+            }
+        )
+        self.assertNotEqual(req.status_code, 403)
+
+        req = self.anonymous_client_1.get('/api/account/profile/')
+        self.assertEqual(req.json()['user']['username'], 'test_user1')
+
+    def test_login_and_logout(self):
+        req = self.anonymous_client_2.get('/api/account/profile/')
+        self.assertEqual(req.status_code, 403)
+
+        req = self.anonymous_client_2.post(
+            '/api/account/login/',
+            data={
+                'username': self.user1.user.username,
+                'password': 'user1_password',
+            }
+        )
+        self.assertNotEqual(req.status_code, 403)
+
+        req = self.anonymous_client_2.get('/api/account/profile/')
+        self.assertEqual(req.json()['user']['username'], self.user1.user.username)
+
+        self.anonymous_client_2.post('/api/account/logout/')
+        req = self.anonymous_client_2.get('/api/account/profile/')
+        self.assertEqual(req.status_code, 403)
 
 
 class UserGroupTest(TestCases):
