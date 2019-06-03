@@ -15,7 +15,7 @@ class UserHasSongPermission(permissions.BasePermission):
         user = request.user
         if user is None:
             return False
-        return UserServices.user_has_access_to_music(user.profile, obj)
+        return UserServices.user_has_access_to_music(user, obj)
 
 
 class UserHasPlaylistPermission(permissions.BasePermission):

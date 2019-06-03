@@ -6,7 +6,6 @@ from music.models import Song
 
 
 class UserServices:
-
     @classmethod
     def user_has_access_to_music(cls, user_profile: UserProfile, song: Song):
         user_groups = song.user_group.all()
