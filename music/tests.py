@@ -2,7 +2,37 @@ from rest_framework.test import APIClient
 
 from testing.TestCase import TestCases
 
-import json
+
+class TestSongSearchViewSet(TestCases):
+    def setUp(self):
+        self.anonymous_client = APIClient(enforce_csrf_checks=True)
+
+        self.user1 = self.create_user('user1')
+        self.user1_client = APIClient(enforce_csrf_checks=True)
+        self.user1_client.force_authenticate(user=self.user1)
+
+        self.song1 = self.create_song('song1')
+        self.song2 = self.create_song('song2')
+        self.song3 = self.create_song('song3')
+
+        self.ug1 = self.create_user_group('ug1')
+        self.ug1.users.add(self.user1)
+        self.song1.user_group.add(self.ug1)
+
+        self.singer1 = self.create_singer('singer1')
+        self.song2.singer = self.singer1
+        self.song2.save()
+
+    def test_query_singer(self):
+        req = self.anonymous_client.get('/api/song/search/', {'query': 'singer1'})
+        self.assertEqual(len(req.json()), 1)
+
+    def test_query_permission(self):
+        req = self.anonymous_client.get('/api/song/search/', {'query': 'song'})
+        self.assertEqual(len(req.json()), 2)
+
+        req = self.user1_client.get('/api/song/search/', {'query': 'song'})
+        self.assertEqual(len(req.json()), 3)
 
 
 class TestPlaylistViewSet(TestCases):
@@ -33,7 +63,6 @@ class TestPlaylistViewSet(TestCases):
         self.assertEqual(req.json()['name'], 'user1_playlist')
         playlist_id = req.json()['id']
         req = self.user1_client.delete('/api/playlist/%d/' % playlist_id)
-        print(req)
         self.assertEqual(req.json(), {})
 
         req = self.user2_client.post('/api/playlist/', data={'name': 'user2_playlist'})

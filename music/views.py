@@ -13,6 +13,8 @@ from music.serializers import SongSerializer, PlaylistSerializer
 
 import random
 
+from music.services import MusicService
+
 
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
@@ -33,6 +35,21 @@ class SongViewSet(viewsets.ModelViewSet):
 
         selected = random.sample(range(songs_to_select.count()), 1)[0]
         return Response(SongSerializer([songs_to_select[selected]], many=True).data)
+
+    @action(detail=False)
+    def search(self, request: Request):
+        query = request.query_params.get('query', None)
+        if not query:
+            return Response([])
+        search_result = MusicService.search_song_by_query(query)
+        res = []
+        for item in search_result:
+            try:
+                self.check_object_permissions(request, item)
+                res.append(item)
+            except Exception:
+                pass
+        return Response(SongSerializer(res, many=True).data)
 
 
 class PlaylistViewSet(
