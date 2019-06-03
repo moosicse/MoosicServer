@@ -20,11 +20,12 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from music.views import SongViewSet
+from music.views import SongViewSet, PlaylistViewSet
 
 router = routers.DefaultRouter()
 
 router.register(r'^song', SongViewSet, base_name='song_viewset')
+router.register(r'^playlist', PlaylistViewSet, base_name='playlist_viewset')
 
 urlpatterns = [
     url(r'^api/', include(router.urls)),

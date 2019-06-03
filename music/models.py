@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User
 from django.db import models
 
+from account.models import UserProfile
 from music.constants import SEX_CHOICES
 
 
@@ -51,7 +51,7 @@ class Song(models.Model):
 class Playlist(models.Model):
     name = models.CharField(max_length=20)
     songs = models.ManyToManyField(Song, related_name='playlist_set')
-    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(UserProfile, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name

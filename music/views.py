@@ -1,12 +1,15 @@
+from typing import Any
+
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
 from rest_framework.decorators import action
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 
-from music.models import Song
-from music.permissions import UserHasSongPermission
-from music.serializers import SongSerializer
+from music.models import Song, Playlist
+from music.permissions import UserHasSongPermission, UserHasPlaylistPermission
+from music.serializers import SongSerializer, PlaylistSerializer
 
 import random
 
@@ -30,3 +33,82 @@ class SongViewSet(viewsets.ModelViewSet):
 
         selected = random.sample(range(songs_to_select.count()), 1)[0]
         return Response(SongSerializer([songs_to_select[selected]], many=True).data)
+
+
+class PlaylistViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+):
+    queryset = Playlist.objects.all()
+    serializer_class = PlaylistSerializer
+    permission_classes = (UserHasPlaylistPermission,)
+
+    def create(self, request: Request, *args: Any, **kwargs: Any):
+        user = request.user
+        if isinstance(user, AnonymousUser):
+            return Response(status=403)
+        name = request.data.get('name', None)
+        if not name:
+            return Response(status=403)
+        playlist = Playlist.objects.create(
+            name=name, created_by=user
+        )
+        return Response(PlaylistSerializer(playlist).data)
+
+    def destroy(self, request: Request, *args: Any, **kwargs: Any):
+        user = request.user
+        if isinstance(user, AnonymousUser):
+            return Response(status=403)
+        playlist = self.get_object()
+        if playlist:
+            playlist.delete()
+        return Response({})
+
+    def list(self, request: Request, *args: Any, **kwargs: Any):
+        user = request.user
+        if isinstance(user, AnonymousUser):
+            return Response(status=403)
+
+        playlist = Playlist.objects.filter(created_by=user.id)
+        return Response(PlaylistSerializer(playlist, many=True).data)
+
+    @action(detail=True, methods=['POST'])
+    def add_song(self, request: Request, pk: int):
+        user = request.user
+
+        if isinstance(user, AnonymousUser):
+            return Response(status=403)
+
+        playlist = Playlist.objects.filter(id=pk).first()
+        if not playlist or playlist.created_by != user:
+            return Response(status=403)
+        # Have to use POST
+        songs: list = request.POST.getlist('song', [])
+        res: list = []
+        for song in songs:
+            song_instance = Song.objects.filter(id=song).first()
+            if song_instance:
+                playlist.songs.add(song_instance)
+                res.append(song)
+        return Response(res)
+
+    @action(detail=True, methods=['POST'])
+    def remove_song(self, request: Request, pk: int):
+        user = request.user
+
+        if isinstance(user, AnonymousUser):
+            return Response(status=403)
+
+        playlist = Playlist.objects.filter(id=pk).first()
+        if not playlist or playlist.created_by != user:
+            return Response(status=403)
+        songs: list = request.data.get('song')
+        res: list = []
+        for song in songs:
+            song_instance = Song.objects.filter(id=song).first()
+            if song_instance:
+                playlist.songs.remove(song_instance)
+                res.append(song)
+        return Response(res)
