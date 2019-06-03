@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase as DjangoTestCase
 
 from account.models import UserProfile, UserGroup
-from music.models import Song
+from music.models import Song, Playlist
 
 
 class TestCases(DjangoTestCase):
@@ -45,3 +45,6 @@ class TestCases(DjangoTestCase):
     # Model music
     def create_song(self, name: str):
         return Song.objects.create(name=name)
+
+    def create_playlist(self, name: str):
+        return Playlist.objects.create(name=name)
