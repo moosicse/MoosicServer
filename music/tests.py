@@ -3,6 +3,86 @@ from rest_framework.test import APIClient
 from testing.TestCase import TestCases
 
 
+class TestAlbumViewSet(TestCases):
+    def setUp(self):
+        self.anonymous_client = APIClient(enforce_csrf_checks=True)
+
+        self.user1 = self.create_user('user1')
+        self.user1_client = APIClient(enforce_csrf_checks=True)
+        self.user1_client.force_authenticate(user=self.user1)
+
+        self.song1 = self.create_song('song1')
+        self.song2 = self.create_song('song2')
+        self.song3 = self.create_song('song3')
+
+        self.ug1 = self.create_user_group('ug1')
+        self.ug1.users.add(self.user1)
+        self.song1.user_group.add(self.ug1)
+
+        self.album1 = self.create_album('album1')
+
+        self.song1.album = self.album1
+        self.song1.save()
+        self.song2.album = self.album1
+        self.song2.save()
+        self.song3.album = self.album1
+        self.song3.save()
+
+    def test_anonymous_album_api(self):
+        req = self.anonymous_client.get('/api/album/%d/' % self.album1.id)
+        self.assertEqual(req.json()['name'], self.album1.name)
+
+        req = self.anonymous_client.get('/api/album/%d/songs/' % self.album1.id)
+        self.assertEqual(len(req.json()), 2)
+
+    def test_user1_album_api(self):
+        req = self.user1_client.get('/api/album/%d/' % self.album1.id)
+        self.assertEqual(req.json()['name'], self.album1.name)
+
+        req = self.user1_client.get('/api/album/%d/songs/' % self.album1.id)
+        self.assertEqual(len(req.json()), 3)
+
+
+class TestSingerViewSet(TestCases):
+    def setUp(self):
+        self.anonymous_client = APIClient(enforce_csrf_checks=True)
+
+        self.user1 = self.create_user('user1')
+        self.user1_client = APIClient(enforce_csrf_checks=True)
+        self.user1_client.force_authenticate(user=self.user1)
+
+        self.song1 = self.create_song('song1')
+        self.song2 = self.create_song('song2')
+        self.song3 = self.create_song('song3')
+
+        self.ug1 = self.create_user_group('ug1')
+        self.ug1.users.add(self.user1)
+        self.song1.user_group.add(self.ug1)
+
+        self.singer1 = self.create_singer('singer1')
+
+        self.song1.singer = self.singer1
+        self.song1.save()
+        self.song2.singer = self.singer1
+        self.song2.save()
+        self.song3.singer = self.singer1
+        self.song3.save()
+
+    def test_anonymous_album_api(self):
+        req = self.anonymous_client.get('/api/singer/%d/' % self.singer1.id)
+        self.assertEqual(req.json()['name'], self.singer1.name)
+
+        req = self.anonymous_client.get('/api/singer/%d/songs/' % self.singer1.id)
+        self.assertEqual(len(req.json()), 2)
+
+    def test_user1_singer_api(self):
+        req = self.user1_client.get('/api/singer/%d/' % self.singer1.id)
+        self.assertEqual(req.json()['name'], self.singer1.name)
+
+        req = self.user1_client.get('/api/singer/%d/songs/' % self.singer1.id)
+        self.assertEqual(len(req.json()), 3)
+
+
 class TestSongSearchViewSet(TestCases):
     def setUp(self):
         self.anonymous_client = APIClient(enforce_csrf_checks=True)

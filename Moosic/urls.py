@@ -21,12 +21,14 @@ from django.urls import path, include
 from rest_framework import routers
 
 from account.views import AccountViewSet
-from music.views import SongViewSet, PlaylistViewSet
+from music.views import SongViewSet, PlaylistViewSet, AlbumViewSet, SingerViewSet
 
 router = routers.DefaultRouter()
 
 router.register(r'^song', SongViewSet, base_name='song_viewset')
 router.register(r'^account', AccountViewSet, base_name='account_viewset')
+router.register(r'^album', AlbumViewSet, base_name='album_viewset')
+router.register(r'^singer', SingerViewSet, base_name='singer_viewset')
 router.register(r'^playlist', PlaylistViewSet, base_name='playlist_viewset')
 
 urlpatterns = [
