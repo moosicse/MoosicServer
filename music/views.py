@@ -7,13 +7,44 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 
-from music.models import Song, Playlist
+from account.services import UserServices
+from music.models import Song, Playlist, Album, Singer
 from music.permissions import UserHasSongPermission, UserHasPlaylistPermission
-from music.serializers import SongSerializer, PlaylistSerializer
+from music.serializers import SongSerializer, PlaylistSerializer, AlbumSerializer, SingerSerializer
 
 import random
 
 from music.services import MusicService
+
+
+class AlbumViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Album.objects.all()
+    serializer_class = AlbumSerializer
+    permission_classes = ()
+
+    @action(detail=True)
+    def songs(self, request: Request, pk: int):
+        album = Album.objects.get(id=pk)
+        songs = []
+        for song in album.song_set.all():
+            if UserServices.user_has_access_to_music(request.user, song):
+                songs.append(song)
+        return Response(SongSerializer(songs, many=True).data)
+
+
+class SingerViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
+    queryset = Singer.objects.all()
+    serializer_class = SingerSerializer
+    permission_classes = ()
+
+    @action(detail=True)
+    def songs(self, request: Request, pk: int):
+        singer = Singer.objects.get(id=pk)
+        songs = []
+        for song in singer.song_set.all():
+            if UserServices.user_has_access_to_music(request, song):
+                songs.append(song)
+        return Response(SongSerializer(songs, many=True).data)
 
 
 class SongViewSet(viewsets.ModelViewSet):
