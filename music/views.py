@@ -42,7 +42,7 @@ class SingerViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
         singer = Singer.objects.get(id=pk)
         songs = []
         for song in singer.song_set.all():
-            if UserServices.user_has_access_to_music(request, song):
+            if UserServices.user_has_access_to_music(request.user, song):
                 songs.append(song)
         return Response(SongSerializer(songs, many=True).data)
 

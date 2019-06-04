@@ -75,7 +75,7 @@ class TestSingerViewSet(TestCases):
         req = self.anonymous_client.get('/api/singer/%d/songs/' % self.singer1.id)
         self.assertEqual(len(req.json()), 2)
 
-    def test_user1_album_api(self):
+    def test_user1_singer_api(self):
         req = self.user1_client.get('/api/singer/%d/' % self.singer1.id)
         self.assertEqual(req.json()['name'], self.singer1.name)
 
