@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from django.db.models import Q
 from rest_framework.decorators import action
 from rest_framework.request import Request
@@ -98,6 +98,8 @@ class PlaylistViewSet(
         user = request.user
         if isinstance(user, AnonymousUser):
             return Response(status=403)
+        if isinstance(user, User):
+            user = user.profile
         name = request.data.get('name', None)
         if not name:
             return Response(status=403)
