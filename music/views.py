@@ -88,6 +88,7 @@ class PlaylistViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
 ):
     queryset = Playlist.objects.all()
     serializer_class = PlaylistSerializer
@@ -104,15 +105,6 @@ class PlaylistViewSet(
             name=name, created_by=user
         )
         return Response(PlaylistSerializer(playlist).data)
-
-    def destroy(self, request: Request, *args: Any, **kwargs: Any):
-        user = request.user
-        if isinstance(user, AnonymousUser):
-            return Response(status=403)
-        playlist = self.get_object()
-        if playlist:
-            playlist.delete()
-        return Response({})
 
     def list(self, request: Request, *args: Any, **kwargs: Any):
         user = request.user

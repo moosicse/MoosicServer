@@ -1,4 +1,6 @@
+from django.contrib.auth.models import AnonymousUser, User
 from rest_framework import permissions
+from rest_framework.request import Request
 
 from account.services import UserServices
 from music.models import Song, Playlist
@@ -22,7 +24,13 @@ class UserHasPlaylistPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         return True
 
-    def has_object_permission(self, request, view, obj: Playlist):
+    def has_object_permission(self, request: Request, view, obj: Playlist):
         user = request.user
+
+        if isinstance(user, AnonymousUser):
+            return False
+
+        if isinstance(user, User):
+            user = user.profile
 
         return obj.created_by == user
