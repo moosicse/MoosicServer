@@ -142,17 +142,26 @@ class TestPlaylistViewSet(TestCases):
         req = self.user1_client.post('/api/playlist/', data={'name': 'user1_playlist'})
         self.assertEqual(req.json()['name'], 'user1_playlist')
         playlist_id = req.json()['id']
-        req = self.user1_client.delete('/api/playlist/%d/' % playlist_id)
-        self.assertEqual(req.json(), {})
+        req = self.user1_client.get('/api/playlist/')
+        self.assertEqual(len(req.json()), 2)
+        self.user1_client.delete('/api/playlist/%d/' % playlist_id)
+        req = self.user1_client.get('/api/playlist/')
+        self.assertEqual(len(req.json()), 1)
 
         req = self.user2_client.post('/api/playlist/', data={'name': 'user2_playlist'})
         self.assertEqual(req.json()['name'], 'user2_playlist')
         playlist_id = req.json()['id']
-        req = self.user2_client.delete('/api/playlist/%d/' % playlist_id)
-        self.assertEqual(req.json(), {})
+        req = self.user2_client.get('/api/playlist/')
+        self.assertEqual(len(req.json()), 2)
+        self.user2_client.delete('/api/playlist/%d/' % playlist_id)
+        req = self.user2_client.get('/api/playlist/')
+        self.assertEqual(len(req.json()), 1)
 
         anonymous_req = self.anonymous_client.post('/api/playlist/', data={'name': 'anonymous_playlist'})
         self.assertEqual(anonymous_req.status_code, 403)
+
+        anonymous_req = self.anonymous_client.delete('/api/playlist/%d/' % playlist_id)
+        self.assertEqual(anonymous_req.status_code, 404)
 
     def test_add_song_to_playlist(self):
         req = self.user1_client.post(
