@@ -181,6 +181,18 @@ class TestPlaylistViewSet(TestCases):
         )
         self.assertEqual(req.status_code, 403)
 
+    def test_playlist_permission(self):
+        req = self.user1_client.post('/api/playlist/', data={'name': 'permission_test'})
+        self.assertEqual(req.json()['name'], 'permission_test')
+        playlist_id = req.json()['id']
+
+        req = self.user1_client.get('/api/playlist/%d/' % playlist_id)
+        self.assertEqual(req.status_code, 200)
+        req = self.user2_client.get('/api/playlist/%d/' % playlist_id)
+        self.assertEqual(req.status_code, 403)
+        req = self.anonymous_client.get('/api/playlist/%d/' % playlist_id)
+        self.assertEqual(req.status_code, 403)
+
     def test_anonymous(self):
         req = self.anonymous_client.post(
             '/api/playlist/%d/add_song/' % self.playlist2.id,
