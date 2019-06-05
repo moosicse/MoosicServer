@@ -122,14 +122,21 @@ class PlaylistViewSet(
 
         if isinstance(user, AnonymousUser):
             return Response(status=403)
+        if isinstance(user, User):
+            user = user.profile
 
         playlist = Playlist.objects.filter(id=pk).first()
         if not playlist or playlist.created_by != user:
             return Response(status=403)
         # Have to use POST
-        songs: list = request.POST.getlist('song', [])
+        song: str = request.data.get('song', None)
         res: list = []
-        for song in songs:
+
+        if song:
+            try:
+                song = int(song)
+            except:
+                return Response(status=403)
             song_instance = Song.objects.filter(id=song).first()
             if song_instance:
                 playlist.songs.add(song_instance)
@@ -142,13 +149,20 @@ class PlaylistViewSet(
 
         if isinstance(user, AnonymousUser):
             return Response(status=403)
+        if isinstance(user, User):
+            user = user.profile
 
         playlist = Playlist.objects.filter(id=pk).first()
         if not playlist or playlist.created_by != user:
             return Response(status=403)
-        songs: list = request.data.get('song')
+
+        song: str = request.data.get('song', None)
         res: list = []
-        for song in songs:
+        if song:
+            try:
+                song = int(song)
+            except:
+                return Response(status=403)
             song_instance = Song.objects.filter(id=song).first()
             if song_instance:
                 playlist.songs.remove(song_instance)
