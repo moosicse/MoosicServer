@@ -23,7 +23,7 @@ class Singer(models.Model):
 
 
 class Album(models.Model):
-    name = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=32, blank=True, null=True)
     cover = models.ImageField(upload_to='image', blank=True, null=True)
     singer = models.ManyToManyField(Singer)
     published_date = models.DateField(null=True, blank=True)
