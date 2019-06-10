@@ -39,7 +39,7 @@ class Song(models.Model):
     singer = models.ForeignKey(Singer, blank=True, null=True, on_delete=models.SET_NULL)
     album = models.ForeignKey(Album, blank=True, null=True, on_delete=models.SET_NULL)
     genres = models.ManyToManyField(Genre, blank=True, related_name='song_set')
-    mood = models.TextField(default='{}')
+    mood = models.CharField(max_length=64, default='Calm')
     user_group = models.ManyToManyField('account.UserGroup', blank=True, related_name='song_set')
     file = models.FileField(upload_to='music', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
