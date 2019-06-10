@@ -168,3 +168,8 @@ class PlaylistViewSet(
                 playlist.songs.remove(song_instance)
                 res.append(song)
         return Response(res)
+
+    @action(detail=False)
+    def motion(self, request: Request):
+        motion = request.query_params.get('motion')
+        
