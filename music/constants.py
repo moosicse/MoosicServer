@@ -7,3 +7,5 @@ SEX_CHOICES = (
     (SexChoices.MALE, '男'),
     (SexChoices.FEMALE, '女'),
 )
+
+MOOD_SONG_COUNT = 5
