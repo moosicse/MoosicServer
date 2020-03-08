@@ -172,20 +172,22 @@ class PlaylistViewSet(
 
     @action(detail=False)
     def motion(self, request: Request):
-        motion = request.query_params.get('motion')
-        query = Q()
+        motion = request.query_params.get('motion', '')
+        query = Q(mood='mood')
         if motion == 'joy':
-            query |= Q(mood='happy')
-            query |= Q(mood='excited')
+            query |= Q(mood='Happy')
+            query |= Q(mood='Excited')
         elif motion == 'sadness':
-            query |= Q(mood='sad')
-            query |= Q(mood='calm')
+            query |= Q(mood='Sad')
+            query |= Q(mood='Calm')
         elif motion == 'anger':
-            query |= Q(mood='calm')
+            query |= Q(mood='Calm')
         elif motion == 'surprise':
-            query |= Q(mood='excited')
+            query |= Q(mood='Excited')
 
         songs = Song.objects.filter(query)
+        import logging
+        logging.warning(query)
         if len(songs) > MOOD_SONG_COUNT:
-            songs = random.sample(songs, MOOD_SONG_COUNT)
-        return Response(SongSerializer(songs).data)
+            songs = random.sample(list(songs), MOOD_SONG_COUNT)
+        return Response(SongSerializer(songs, many=True).data)
