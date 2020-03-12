@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 
 from account.services import UserServices
+from music.constants import MOOD_SONG_COUNT
 from music.models import Song, Playlist, Album, Singer
 from music.permissions import UserHasSongPermission, UserHasPlaylistPermission
 from music.serializers import SongSerializer, PlaylistSerializer, AlbumSerializer, SingerSerializer
@@ -168,3 +169,25 @@ class PlaylistViewSet(
                 playlist.songs.remove(song_instance)
                 res.append(song)
         return Response(res)
+
+    @action(detail=False)
+    def motion(self, request: Request):
+        motion = request.query_params.get('motion', '')
+        query = Q(mood='mood')
+        if motion == 'joy':
+            query |= Q(mood='Happy')
+            query |= Q(mood='Excited')
+        elif motion == 'sadness':
+            query |= Q(mood='Sad')
+            query |= Q(mood='Calm')
+        elif motion == 'anger':
+            query |= Q(mood='Calm')
+        elif motion == 'surprise':
+            query |= Q(mood='Excited')
+
+        songs = Song.objects.filter(query)
+        import logging
+        logging.warning(query)
+        if len(songs) > MOOD_SONG_COUNT:
+            songs = random.sample(list(songs), MOOD_SONG_COUNT)
+        return Response(SongSerializer(songs, many=True).data)
